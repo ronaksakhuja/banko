@@ -266,6 +266,7 @@ function changePotMoney(res, pid, deck_id, amount) {
                 net: player_amount
             });
             potadd = amount;
+            $("#updateWinner").html(snapshot.val()["players"][pid].name + " lost " + amount);
 
         }
         if (res == 1) {
@@ -277,6 +278,8 @@ function changePotMoney(res, pid, deck_id, amount) {
                 net: player_amount
             });
             potadd = -1 * amount;
+            $("#updateWinner").html(snapshot.val()["players"][pid].name + " won " + amount);
+
         }
         if (res == 2) {
             // double loss for player
@@ -287,6 +290,8 @@ function changePotMoney(res, pid, deck_id, amount) {
                 net: player_amount
             });
             potadd = amount * 2;
+            $("#updateWinner").html(snapshot.val()["players"][pid].name + " MEGA LOST " + 2 * amount);
+
         }
         newpot = snapshot.val().pot + potadd;
         if (newpot == 0) {
