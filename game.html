@@ -1,0 +1,87 @@
+<html>
+
+<head>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="full-height row no-gutters">
+            <div id="playarea" class="col-sm-12">
+                <!-- main div with cards -->
+                <div class="container-fluid">
+                    <div class="row two-third">
+                        <table>
+                            <tr id="player_names">
+                                <!-- for the cards -->
+
+                            </tr>
+                            <tr id="card0">
+                                <!-- for the player name -->
+
+                            </tr>
+                            <tr id="card1">
+                                <!-- for the player name -->
+
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="row one-third">
+                        <div class="col-sm-9">
+                            <div class="row">
+                                <div class="col sm-8">
+                                    <input type="button" id="drawcards" value="DRAW">
+                                    <input type="button" id="shuffle" value="SHUFFLE">
+                                    <div id="turn_buttons">
+                                        <input type="text" id="bidvalue">
+                                        <input type="button" id="bidbutton" value="BID" disabled=true>
+                                    </div>
+                                    It's
+                                    <span id="turn_name"></span>'s turn
+                                </div>
+                                <div class="col-sm-4" id="new_card"></div>
+                            </div>
+                        </div>
+                        <div id="transaction" class="col-sm-3">
+                            <!-- Transaction -->
+                            POT VALUE : <span id="potvalue"></span>
+                            <table id="winnings">
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- scripts -->
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-database.js"></script>
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyCcwXOWKoZhtv6H58ar-JoewHWntWmouSQ",
+            authDomain: "bank-ab837.firebaseapp.com",
+            databaseURL: "https://bank-ab837.firebaseio.com",
+            projectId: "bank-ab837",
+            storageBucket: "bank-ab837.appspot.com",
+            messagingSenderId: "1002970463106",
+            appId: "1:1002970463106:web:1554b539e2c6071f06ed9b"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.0.min.js" integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
+    <script src="js/game.js"></script>
+</body>
+
+</html>

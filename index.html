@@ -1,0 +1,39 @@
+<html>
+
+<body>
+    <input id="name" type="text">
+    <input id="creategame" type="button" value="Create Game">
+
+    <br><br> Join Game
+    <input id="idname" type="text">
+    <input id="joinGame" type="button" value="submit">
+
+
+
+    <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-app.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/7.14.2/firebase-database.js"></script>
+
+
+    <!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+    <script>
+        // Your web app's Firebase configuration
+        var firebaseConfig = {
+            apiKey: "AIzaSyCcwXOWKoZhtv6H58ar-JoewHWntWmouSQ",
+            authDomain: "bank-ab837.firebaseapp.com",
+            databaseURL: "https://bank-ab837.firebaseio.com",
+            projectId: "bank-ab837",
+            storageBucket: "bank-ab837.appspot.com",
+            messagingSenderId: "1002970463106",
+            appId: "1:1002970463106:web:1554b539e2c6071f06ed9b"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.0.min.js" integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
+    <script src="js/index.js"></script>
+</body>
+
+</html>
