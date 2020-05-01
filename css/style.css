@@ -5,16 +5,16 @@
 }
 
 #playarea {
-    background-color: cyan;
+    background-color: rgb(95, 95, 95);
 }
 
 #transaction {
-    background-color: white;
+    background-color: #e3e3e3;
 }
 
 .row.one-third {
     height: 33.3%;
-    background-color: green;
+    background-color: #e3e3e3;
 }
 
 .row.two-third {
