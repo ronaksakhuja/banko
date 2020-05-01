@@ -19,17 +19,23 @@ $("#bidbutton").on("click", function() {
         firebase.database().ref('games/' + gameID).update({
             checkercard: data
         });
-        cardVal = data["cards"][0].value;
-        console.log("withdrawn card is" + cardVal);
-        pid = localStorage["pid"];
-        cardVal = convertFaceCards(cardVal);
-        amount = parseInt($("#bidvalue")[0].value);
+        setTimeout(function() {
 
-        res = checkInBetween(cardVal, pid, amount);
-        changePotMoney(res, pid, deck_id, amount);
+            // Something you want delayed.
+            cardVal = data["cards"][0].value;
+            console.log("withdrawn card is" + cardVal);
+            pid = localStorage["pid"];
+            cardVal = convertFaceCards(cardVal);
+            amount = parseInt($("#bidvalue")[0].value);
+
+            res = checkInBetween(cardVal, pid, amount);
+            changePotMoney(res, pid, deck_id, amount);
+            nextTurnFirebase(deck_id);
+
+        }, 2000);
+
 
     });
-    nextTurnFirebase(deck_id);
 });
 
 function convertFaceCards(cardVal) {
@@ -192,6 +198,8 @@ function nextTurnFirebase(gameID) {
         players = snapshot.val()["players"].count;
         turn = (snapshot.val().turn + 1) % players;
         firstturn = snapshot.val().firstturn;
+        console.log("NTF : new turn " + turn + " firstturn " + firstturn);
+
         if (turn == firstturn) {
             //round is over
             $("#shuffle").click();
@@ -244,6 +252,8 @@ function changePotMoney(res, pid, deck_id, amount) {
 
         if (res == 0) {
             //player lost amount
+            var audio = new Audio('audio/loosing.mp3');
+            audio.play();
             player_amount = parseInt(snapshot.val()["players"][pid].net) - amount;
             firebase.database().ref('games/' + gameID + "/players/" + pid).update({
                 net: player_amount
@@ -253,6 +263,8 @@ function changePotMoney(res, pid, deck_id, amount) {
         }
         if (res == 1) {
             //player wins
+            var audio = new Audio('audio/winning.mp3');
+            audio.play();
             player_amount = parseInt(snapshot.val()["players"][pid].net) + amount;
             firebase.database().ref('games/' + gameID + "/players/" + pid).update({
                 net: player_amount
@@ -261,6 +273,8 @@ function changePotMoney(res, pid, deck_id, amount) {
         }
         if (res == 2) {
             // double loss for player
+            var audio = new Audio('audio/loosing.mp3');
+            audio.play();
             player_amount = parseInt(snapshot.val()["players"][pid].net) - amount - amount;
             firebase.database().ref('games/' + gameID + "/players/" + pid).update({
                 net: player_amount
@@ -268,8 +282,34 @@ function changePotMoney(res, pid, deck_id, amount) {
             potadd = amount * 2;
         }
         newpot = snapshot.val().pot + potadd;
+        if (newpot == 0) {
+
+            turn = snapshot.val().turn;
+            firstturn = snapshot.val().firstturn;
+            newturn = (firstturn + 1) % players;
+            console.log("CPM : new turn " + turn + " firstturn " + firstturn);
+
+            firebase.database().ref('games/' + gameID).update({
+                turn: newturn,
+                firstturn: newturn
+            });
+            // end the round
+            for (var i = 0; i < players; i++) {
+                firebase.database().ref('games/' + gameID + "/players/" + i).update({
+                    card0: "null",
+                    card1: "null"
+                });
+
+            }
+            //changing turn to first turn-1 so that it can trigger change of new firstturn
+
+        }
         firebase.database().ref('games/' + gameID).update({
             pot: newpot
         });
     });
+}
+
+function mod(n, m) {
+    return ((n % m) + m) % m;
 }
