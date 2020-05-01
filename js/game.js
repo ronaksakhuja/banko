@@ -1,5 +1,10 @@
 gameID = localStorage["gameID"];
 $("#gameid").html(gameID);
+myid = localStorage["pid"];
+if (myid != 0) {
+    $("#startGame").hide();
+
+}
 
 $("#startGame").on("click", function() {
     $("#startGame").hide();
@@ -20,29 +25,45 @@ $("#shuffle").on("click", function() {
 });
 $("#bidbutton").on("click", function() {
     //transactions later on
-    deck_id = localStorage["gameID"];
-    //withdraw card to check win or not
-    $.getJSON("https://deckofcardsapi.com/api/deck/" + deck_id + "/draw/?count=1", function(data) {
-        firebase.database().ref('games/' + gameID).update({
-            checkercard: data
+    //checkif bid amount more than pot
+    amount = parseInt($("#bidvalue")[0].value);
+    pot = localStorage["potvalue"];
+    if (amount > pot) {
+        alert("Amount cannot be higher than Pot value");
+    } else {
+        deck_id = localStorage["gameID"];
+        //withdraw card to check win or not
+        $.getJSON("https://deckofcardsapi.com/api/deck/" + deck_id + "/draw/?count=1", function(data) {
+            firebase.database().ref('games/' + gameID).update({
+                checkercard: data
+            });
+            setTimeout(function() {
+
+                // Something you want delayed.
+                cardVal = data["cards"][0].value;
+                console.log("withdrawn card is" + cardVal);
+                pid = localStorage["pid"];
+                cardVal = convertFaceCards(cardVal);
+
+                res = checkInBetween(cardVal, pid, amount);
+                changePotMoney(res, pid, deck_id, amount);
+                nextTurnFirebase(deck_id);
+
+            }, 1000);
+
+
         });
-        setTimeout(function() {
-
-            // Something you want delayed.
-            cardVal = data["cards"][0].value;
-            console.log("withdrawn card is" + cardVal);
-            pid = localStorage["pid"];
-            cardVal = convertFaceCards(cardVal);
-            amount = parseInt($("#bidvalue")[0].value);
-
-            res = checkInBetween(cardVal, pid, amount);
-            changePotMoney(res, pid, deck_id, amount);
-            nextTurnFirebase(deck_id);
-
-        }, 2000);
+    }
 
 
-    });
+});
+$("#bankobutton").on("click", function() {
+    $("#bidvalue").attr("value", localStorage["potvalue"]);
+    $("#bidbutton").click();
+});
+$("#passbutton").on("click", function() {
+    $("#bidvalue").attr("value", 0);
+    $("#bidbutton").click();
 });
 
 function convertFaceCards(cardVal) {
@@ -109,6 +130,9 @@ var player = firebase.database().ref('games/' + gameID + '/players');
 player.on('value', function(snapshot) {
     if (snapshot.val() != undefined) {
         localStorage.setItem("player_data", JSON.stringify(snapshot.val()));
+        if (snapshot.val()[0].card0 == "null") {
+            $("#new_card").html("");
+        }
         updateTableWinnings();
         count_players = snapshot.val().count;
         player_names = "";
@@ -143,8 +167,13 @@ turn.on('value', function(snapshot) {
     myid = localStorage["pid"];
     if (myid == turnid) {
         $("#bidbutton").attr("disabled", false)
+        $("#bankobutton").attr("disabled", false)
+        $("#passbutton").attr("disabled", false)
+
     } else {
         $("#bidbutton").attr("disabled", true)
+        $("#bankobutton").attr("disabled", true)
+        $("#passbutton").attr("disabled", true)
     }
 
 });
@@ -152,19 +181,20 @@ turn.on('value', function(snapshot) {
 var potval = firebase.database().ref('games/' + gameID + '/pot');
 potval.on('value', function(snapshot) {
     $("#potvalue").html(snapshot.val());
+    localStorage.setItem("potvalue", parseInt(snapshot.val()));
     if (localStorage["pid"] == "0") {
 
         if (snapshot.val() == 0) {
             //pot is 0, everyone pitches in money
-            alert("Withdrawing Boot Value");
+            console.log("Withdrawing Boot Value");
 
             withdrawBoot(gameID);
         }
     }
 
 });
-var updatestring = firebase.database().ref('games/' + gameID + '/updatestr');
-potval.on('value', function(snapshot) {
+var updatestring = firebase.database().ref('games/' + gameID + '/lastupdate');
+updatestring.on('value', function(snapshot) {
     $("#updateWinner").html(snapshot.val());
 
 });
@@ -213,13 +243,19 @@ function nextTurnFirebase(gameID) {
         console.log("NTF : new turn " + turn + " firstturn " + firstturn);
 
         if (turn == firstturn) {
+            setTimeout(function() {
+
+                $("#shuffle").click();
+                firstturn = (firstturn + 1) % players;
+                firebase.database().ref('games/' + gameID).update({
+                    firstturn: firstturn,
+                    turn: firstturn
+                });
+                $("#new_card").html("");
+                alert("Next Round! Draw Cards");
+            }, 1000);
             //round is over
-            $("#shuffle").click();
-            firstturn = (firstturn + 1) % players;
-            firebase.database().ref('games/' + gameID).update({
-                firstturn: firstturn,
-                turn: firstturn
-            });
+
             //update first turn++ and turn =firstturn
             //shuffle the deck
 
@@ -315,19 +351,22 @@ function changePotMoney(res, pid, deck_id, amount) {
             firstturn = snapshot.val().firstturn;
             newturn = (firstturn + 1) % players;
             console.log("CPM : new turn " + turn + " firstturn " + firstturn);
+            setTimeout(function() {
 
-            firebase.database().ref('games/' + gameID).update({
-                turn: newturn,
-                firstturn: newturn
-            });
-            // end the round
-            for (var i = 0; i < players; i++) {
-                firebase.database().ref('games/' + gameID + "/players/" + i).update({
-                    card0: "null",
-                    card1: "null"
+                firebase.database().ref('games/' + gameID).update({
+                    turn: newturn,
+                    firstturn: newturn
                 });
+                // end the round
+                for (var i = 0; i < players; i++) {
+                    firebase.database().ref('games/' + gameID + "/players/" + i).update({
+                        card0: "null",
+                        card1: "null"
+                    });
+                }
+                alert("Next round! Draw Cards");
+            }, 1000);
 
-            }
             //changing turn to first turn-1 so that it can trigger change of new firstturn
 
         }
