@@ -5,7 +5,7 @@ $("#drawcards").on("click", function() {
 
     getPlayerCount(deck_id);
 })
-
+$("#shuffle").hide();
 $("#shuffle").on("click", function() {
     deck_id = localStorage["gameID"];
 
