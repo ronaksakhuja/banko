@@ -39,7 +39,8 @@ function createNewGame(gameID, name) {
         cardsdrawn: 0,
         firstturn: 0,
         pot: -1,
-        checkercard: "null"
+        checkercard: "null",
+        lastupdate: ""
     });
     firebase.database().ref('games/' + gameID + "/players").set({
         count: 1

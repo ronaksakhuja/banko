@@ -163,6 +163,11 @@ potval.on('value', function(snapshot) {
     }
 
 });
+var updatestring = firebase.database().ref('games/' + gameID + '/updatestr');
+potval.on('value', function(snapshot) {
+    $("#updateWinner").html(snapshot.val());
+
+});
 
 function shuffleFirebase(gameID) {
     return firebase.database().ref('/games/' + gameID).once('value').then(function(snapshot) {
@@ -266,7 +271,10 @@ function changePotMoney(res, pid, deck_id, amount) {
                 net: player_amount
             });
             potadd = amount;
-            $("#updateWinner").html(snapshot.val()["players"][pid].name + " lost " + amount);
+            updateStr = snapshot.val()["players"][pid].name + " lost " + amount;
+            firebase.database().ref('games/' + gameID).update({
+                lastupdate: updateStr
+            });
 
         }
         if (res == 1) {
@@ -278,7 +286,11 @@ function changePotMoney(res, pid, deck_id, amount) {
                 net: player_amount
             });
             potadd = -1 * amount;
-            $("#updateWinner").html(snapshot.val()["players"][pid].name + " won " + amount);
+            updateStr = snapshot.val()["players"][pid].name + " won " + amount;
+            firebase.database().ref('games/' + gameID).update({
+                lastupdate: updateStr
+            });
+            $("#updateWinner").html();
 
         }
         if (res == 2) {
@@ -290,7 +302,10 @@ function changePotMoney(res, pid, deck_id, amount) {
                 net: player_amount
             });
             potadd = amount * 2;
-            $("#updateWinner").html(snapshot.val()["players"][pid].name + " MEGA LOST " + 2 * amount);
+            updateStr = snapshot.val()["players"][pid].name + " MEGA LOST " + 2 * amount;
+            firebase.database().ref('games/' + gameID).update({
+                lastupdate: updateStr
+            });
 
         }
         newpot = snapshot.val().pot + potadd;
@@ -321,6 +336,7 @@ function changePotMoney(res, pid, deck_id, amount) {
         });
     });
 }
+
 
 function mod(n, m) {
     return ((n % m) + m) % m;
