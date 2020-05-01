@@ -1,5 +1,12 @@
 gameID = localStorage["gameID"];
+$("#gameid").html(gameID);
 
+$("#startGame").on("click", function() {
+    $("#startGame").hide();
+    firebase.database().ref('games/' + gameID).update({
+        pot: 0
+    });
+});
 $("#drawcards").on("click", function() {
     deck_id = localStorage["gameID"];
 
